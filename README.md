@@ -1,30 +1,82 @@
-# Conversation and Tone Analyzer Integration Example
+# Watson Developer Cloud Webpack Example
 
-This example provides sample code for integrating [Tone Analyzer][tone_analyzer] and [Conversation][conversation].
+This example app shows a basic client and server setup to use the Watson JS SDK in a client-side context.
 
-  * [tone_detection.js][tone_conversation_integration_example_tone_detection] - sample code to initialize a user object in the conversation payload's context (initUser), to call Tone Analyzer to retrieve tone for a user's input (invokeToneAsync), and to update tone in the user object in the conversation payload's context (updateUserTone).
+The example here uses [express](http://expressjs.com/) to serve the content and [webpack](https://www.npmjs.com/package/webpack-dev-middleware) and
+[webpack-dev-middleware](https://www.npmjs.com/package/webpack-dev-middleware) to generate the client-side bundle.
 
-  * [tone_conversation_integration.v1.js][tone_conversation_integration_example] - sample code to use tone_detection.js to get and add tone to the payload and send a request to the Conversation Service's message endpoint.
+## Important notes
+
+A server-side component is required to generate auth tokens for services that use a username/password combo.
+(This is all services except Alchemy and Visual Recognition which use API keys instead.)
+
+Not all Watson services currently support [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS),
+and in some cases, certain methods work while others do not. Below is a partial list of service support:
+
+The following services support CORS
+
+ * Tradeoff Analytics
+ * Tone Analyzer
+ * Speech to Text*
+ * Text to Speech*
+ * Personality Insights
+ * Document Conversion
+ * All Alchemy services
+
+\* Speech to Text and Text to Speech should be usable via the Node.js SDK, but we also have a [Speech JavaScript SDK](https://www.npmjs.com/package/watson-speech) that was specifically written for browser support.
 
 
-Requirements to run the sample code
+The following services do not support CORS
 
-  * [Tone Analyzer Service credentials][bluemix_tone_analyzer_service]
-  * [Conversation Service credentials][bluemix_conversation_service]
-  * [Conversation Workspace ID][conversation_simple_workspace]
-
-Credentials & the Workspace ID can be set in environment properties, a .env file, or directly in the code.
+ * Language Translator
+ * Visual Recognition (partial support)
+ * Retrieve and Rank
 
 
-Command to run the sample code
+## Webpack configuration
 
-`npm install # just once, to download dependencies`
-`node tone_conversation_integration.v1.js`
+In most cases, you will want the following in your configuration:
 
-[conversation]: https://www.ibm.com/watson/developercloud/conversation.html
-[tone_analyzer]: http://www.ibm.com/watson/developercloud/tone-analyzer.html
-[bluemix_conversation_service]: https://console.ng.bluemix.net/catalog/services/conversation/
-[bluemix_tone_analyzer_service]: https://console.ng.bluemix.net/catalog/services/tone-analyzer/
-[conversation_simple_workspace]: https://github.com/watson-developer-cloud/conversation-simple#workspace
-[tone_conversation_integration_example]: https://github.com/watson-developer-cloud/node-sdk/tree/master/examples/tone_conversation_integration.v1.js
-[tone_conversation_integration_example_tone_detection]: https://github.com/watson-developer-cloud/node-sdk/tree/master/examples/conversation_addons/tone_detection.js
+
+```js
+  node: {
+    // see http://webpack.github.io/docs/configuration.html#node
+    // and https://webpack.js.org/configuration/node/
+    fs: 'empty',
+    net: 'empty',
+    tls: 'empty'
+  },
+```
+
+Several services use the `fs` library, which won't work in browser environments, and the `request` library loads `fs`,
+`net`, and `tls`, but shouldn't need any of them for basic usage because webpack automatically includes
+[equivalent libraries](https://www.npmjs.com/package/node-libs-browser)
+
+Ideally, only the specific services used shoud be included, for example:
+
+```js
+var ToneAnalyzerV3 = require('watson-developer-cloud/tone-analyzer/v3');
+var ConversationV1 = require('watson-developer-cloud/conversation/v1');
+```
+
+**Not Recommended**: It's possible to load the entire library, but it is not recommended due to the added file size:
+
+```js
+var watson = require('watson-developer-cloud');
+```
+or
+```
+const { ConversationV1, ToneAnalyzerV3 } = require('watson-developer-cloud');
+```
+
+Additionally, when importing the entire library, the `shebang-loader` package is need and must be configured
+in webpack.config.js:
+
+```js
+  module: {
+    rules: [{
+        test: /JSONStream/,
+        use: 'shebang-loader'
+    }]
+  }
+```

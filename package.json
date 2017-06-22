@@ -1,16 +1,22 @@
 {
-  "name": "wdc-examples",
+  "name": "watson-developer-cloud-webpack-example",
   "version": "1.0.0",
-  "description": "Examples of using the IBM Watson Developer Cloud Node.js SDK",
-  "private": true,
+  "description": "Use the Watson JS SDK in browsers via webpack",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "async": "^2.1.4",
     "dotenv": "^2.0.0",
-    "speaker": "^0.3.0",
-    "watson-developer-cloud": "*",
-    "wav": "^1.0.1"
+    "express": "^4.14.0",
+    "shebang-loader": "0.0.1",
+    "watson-developer-cloud": "^2.7.1",
+    "webpack": "^2.2.1",
+    "webpack-dev-middleware": "^1.10.0"
   },
+  "devDependencies": {},
   "engines": {
     "node": ">=4"
   }

@@ -1,16 +1,19 @@
 'use strict';
 const express = require('express'); // eslint-disable-line node/no-missing-require
 const app = express();
-const expressBrowserify = require('express-browserify'); // eslint-disable-line node/no-missing-require
 const dotenv = require('dotenv');
 const watson = require('watson-developer-cloud');
 
-const isDev = app.get('env') === 'development';
-app.get(
-  '/bundle.js',
-  expressBrowserify('public/client.js', {
-    watch: isDev,
-    debug: isDev
+// bundle the code
+const webpackDevMiddleware = require('webpack-dev-middleware');
+const webpack = require('webpack');
+const webpackConfig = require('./webpack.config');
+
+const compiler = webpack(webpackConfig);
+
+app.use(
+  webpackDevMiddleware(compiler, {
+    publicPath: '/' // Same as `output.publicPath` in most cases.
   })
 );
 
