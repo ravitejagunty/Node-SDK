@@ -1,14 +1,15 @@
 {
-  "name": "conversation_tone_analyzer_integration",
+  "name": "wdc-examples",
   "version": "1.0.0",
-  "description": "Example combining the Watson Conversation and Tone Analyzer services",
-  "main": "tone_conversation_integration.v1.js",
-  "author": "https://github.com/aprilwebster",
+  "description": "Examples of using the IBM Watson Developer Cloud Node.js SDK",
+  "private": true,
   "license": "Apache-2.0",
   "dependencies": {
-    "bluebird": "^3.4.1",
+    "async": "^2.1.4",
     "dotenv": "^2.0.0",
-    "watson-developer-cloud": "^2.0.3"
+    "speaker": "^0.3.0",
+    "watson-developer-cloud": "*",
+    "wav": "^1.0.1"
   },
   "engines": {
     "node": ">=4"
